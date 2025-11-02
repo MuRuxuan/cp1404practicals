@@ -1,32 +1,40 @@
 """
-Emails
-Estimate: 30 minutes
-Actual: 25 minutes
+Map email addresses to usernames with format validation.
+Validate email contains "@", extract default name from email (before "@", split by "."),
+and allow user to override the default name.
 """
+def main():
+    """Coordinate email input, validation, name mapping, and result display."""
+    email_to_names = {}
+    while True:
+        email = input("Email: ").strip()
+        if not email:
+            break
+        if not is_valid_email(email):
+            print("Invalid email format. Must contain '@'.")
+            continue
+        default_name = extract_name_from_email(email)
+        confirmation = input(f"Is your name {default_name}? (Y/n) ").strip().lower()
+        if confirmation != '' and confirmation != 'y':
+            name = input("Name: ").strip()
+            while not name:
+                print("Name cannot be empty.")
+                name = input("Name: ").strip()
+        else:
+            name = default_name
+        email_to_names[email] = name
+    print("\nEmail to Name Mapping:")
+    for email, name in email_to_names.items():
+        print(f"{name} ({email})")
 
 def extract_name_from_email(email):
-    """Extract the name part from the email"""
-    parts = email.split('@')[0].split('.')
+    """Extract default name from email (e.g., "john.doe@example.com" → "John Doe")."""
+    local_part = email.split('@')[0]
+    name_parts = local_part.split('.')
+    return ' '.join(part.title() for part in name_parts)
 
-    name = ' '.join(part.title() for part in parts)
-    return name
+def is_valid_email(email):
+    """Check if email contains "@" (basic format validation)."""
+    return '@' in email and email.strip() != ''
 
-email_to_name = {}
-
-while True:
-    email = input("Email: ")
-    if not email:
-        break
-
-    name = extract_name_from_email(email)
-
-    confirmation = input(f"Is your name {name}? (Y/n) ").strip().lower()
-
-    if confirmation != '' and confirmation != 'y':
-        name = input("Name: ")
-
-    email_to_name[email] = name
-
-
-for email, name in email_to_name.items():
-    print(f"{name} ({email})")
+main()
